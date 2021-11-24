@@ -3,6 +3,7 @@ package com.example.hw3_recyclerview
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hw3_recyclerview.adapter.ChatAdapter
 import com.example.hw3_recyclerview.adapter.OnUserClick
@@ -10,7 +11,6 @@ import com.example.hw3_recyclerview.data.ViewTypes
 import com.example.hw3_recyclerview.databinding.ActivityMainBinding
 import com.example.hw3_recyclerview.databinding.ButtonsItemBinding
 import com.example.hw3_recyclerview.decorator.MessageDecorator
-import java.lang.IllegalArgumentException
 
 class MainActivity : AppCompatActivity(), OnUserClick {
     private lateinit var bindingActivity: ActivityMainBinding
@@ -45,27 +45,58 @@ class MainActivity : AppCompatActivity(), OnUserClick {
             && currentUserId != ChatAdapter.VIEW_TYPE_MESSAGE_LEFT
             && currentUserId != ChatAdapter.VIEW_TYPE_MESSAGE_RIGHT
         ) {
-            return
+            Toast.makeText(
+                applicationContext,
+                "Enter some message or choose user",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            when (currentUserId) {
+                ChatAdapter.VIEW_TYPE_MESSAGE_LEFT -> {
+                    if (bindingActivity.txtSendMessage.text.isNotEmpty()) {
+                        messagesList.add(
+                            ViewTypes.LeftMessage(
+                                leftMessageCount++,
+                                bindingActivity.txtSendMessage.text.toString()
+                            )
+                        )
+                        bindingActivity.txtSendMessage.text.clear()
+                        updateCounters()
+                        chatAdapter.dataSet = messagesList
+                    } else if (bindingActivity.txtSendMessage.text.isEmpty()) {
+                        Toast.makeText(
+                            applicationContext,
+                            "Enter some message",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                ChatAdapter.VIEW_TYPE_MESSAGE_RIGHT -> {
+                    if (bindingActivity.txtSendMessage.text.isNotEmpty()) {
+                        messagesList.add(
+                            ViewTypes.RightMessage(
+                                rightMessageCount++,
+                                bindingActivity.txtSendMessage.text.toString()
+                            )
+                        )
+                        bindingActivity.txtSendMessage.text.clear()
+                        updateCounters()
+                        chatAdapter.dataSet = messagesList
+                    } else if (bindingActivity.txtSendMessage.text.isEmpty()) {
+                        Toast.makeText(
+                            applicationContext,
+                            "Enter some message",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                else -> Toast.makeText(
+                    applicationContext,
+                    "Enter some message or choose user",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
-
-        val message = when (currentUserId) {
-            ChatAdapter.VIEW_TYPE_MESSAGE_LEFT ->
-                ViewTypes.LeftMessage(
-                    leftMessageCount++,
-                    bindingActivity.txtSendMessage.text.toString()
-                )
-            ChatAdapter.VIEW_TYPE_MESSAGE_RIGHT ->
-                ViewTypes.RightMessage(
-                    rightMessageCount++,
-                    bindingActivity.txtSendMessage.text.toString()
-                )
-            else -> throw IllegalArgumentException()
-        }
-
-        messagesList.add(message)
-        updateCounters()
-        chatAdapter.dataSet = messagesList
-        initAdapter()
     }
 
     @SuppressLint("ResourceAsColor")
