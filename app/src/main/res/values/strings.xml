@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HW3_RecyclerView</string>
+    <string name="btnSent">Sent</string>
 </resources>
